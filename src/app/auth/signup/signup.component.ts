@@ -1,18 +1,22 @@
 import { Component } from "@angular/core"
 import { FormGroup, FormControl, Validators, AbstractControl } from "@angular/forms"
 import { ReactiveFormsModule } from "@angular/forms"
-import { JsonPipe } from "@angular/common"
+import { CommonModule, JsonPipe } from "@angular/common"
 import { MatchPassword } from "../validators/match-password"
 import { UniqueUsername } from "../validators/unique-username"
+import { SharedModule } from "../../shared/shared.module"
 
 @Component({
   selector: "app-signup",
-  imports: [ReactiveFormsModule, JsonPipe],
+  imports: [ReactiveFormsModule, JsonPipe, SharedModule, CommonModule],
   templateUrl: "./signup.component.html",
   styleUrl: "./signup.component.scss",
 })
 export class SignupComponent {
   authForm: FormGroup
+  usernameControl!: FormControl
+  passwordControl!: FormControl
+  passwordConfirmationControl!: FormControl
 
   constructor(private matchPassword: MatchPassword, private uniqueUsername: UniqueUsername) {
     this.authForm = new FormGroup(
@@ -35,5 +39,8 @@ export class SignupComponent {
     this.authForm
       .get("username")
       ?.setAsyncValidators([(control: AbstractControl) => this.uniqueUsername.validate(control as FormControl)])
+    this.usernameControl = this.authForm.get("username") as FormControl
+    this.passwordControl = this.authForm.get("password") as FormControl
+    this.passwordConfirmationControl = this.authForm.get("passwordConfirmation") as FormControl
   }
 }
