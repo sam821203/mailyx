@@ -21,14 +21,17 @@ interface JwtPayload {
 }
 
 interface CustomRequest extends Request {
-  cookies: { [key: string]: string }; // 明確指定 cookies 型別
+  cookies: { [key: string]: string };
 }
 
 @Injectable()
 export class AuthService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async signup(body: SignupBody): Promise<{ message: string }> {
+  async signup(
+    body: SignupBody,
+    res: Response,
+  ): Promise<{ username: string; message: string }> {
     const hashedPassword = await bcrypt.hash(body.password, 10);
     const newUser = new this.userModel({
       username: body.username,
@@ -36,7 +39,22 @@ export class AuthService {
     });
     await newUser.save();
 
-    return { message: 'User created successfully' };
+    const token = jwt.sign({ username: newUser.username }, 'secretKey', {
+      expiresIn: '1h',
+    });
+
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    });
+
+    const responseData = {
+      username: newUser.username,
+      message: 'User created and logged in',
+    };
+    res.json(responseData);
+    return responseData;
   }
 
   async signin(body: SigninBody, res: Response): Promise<{ message: string }> {
@@ -62,7 +80,11 @@ export class AuthService {
       console.error('JWT signing error:', error);
       throw new Error('Internal server error');
     }
-    res.cookie('jwt', token, { httpOnly: true });
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    });
     return { message: 'Signed in successfully' };
   }
 
