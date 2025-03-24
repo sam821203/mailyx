@@ -18,6 +18,7 @@ interface SigninBody {
 
 interface JwtPayload {
   username: string;
+  authenticated: boolean;
 }
 
 interface CustomRequest extends Request {
@@ -31,7 +32,7 @@ export class AuthService {
   async signup(
     body: SignupBody,
     res: Response,
-  ): Promise<{ username: string; message: string }> {
+  ): Promise<{ username: string; authenticated: boolean }> {
     const hashedPassword = await bcrypt.hash(body.password, 10);
     const newUser = new this.userModel({
       username: body.username,
@@ -39,22 +40,28 @@ export class AuthService {
     });
     await newUser.save();
 
-    const token = jwt.sign({ username: newUser.username }, 'secretKey', {
-      expiresIn: '1h',
-    });
+    const token = jwt.sign(
+      { username: newUser.username },
+      process.env.JWT_SECRET || 'default_secret',
+      { expiresIn: '1h' },
+    );
 
     res.cookie('jwt', token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
 
     const responseData = {
       username: newUser.username,
-      message: 'User created and logged in',
+      authenticated: true,
     };
     res.json(responseData);
     return responseData;
+    // return {
+    //   username: newUser.username,
+    //   authenticated: true,
+    // };
   }
 
   async signin(body: SigninBody, res: Response): Promise<{ message: string }> {
@@ -67,7 +74,7 @@ export class AuthService {
     try {
       const generatedToken = jwt.sign(
         { username: user.username },
-        'secretKey',
+        process.env.JWT_SECRET || 'default_secret',
         { expiresIn: '1h' },
       );
 
@@ -82,7 +89,7 @@ export class AuthService {
     }
     res.cookie('jwt', token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
     return { message: 'Signed in successfully' };
@@ -95,13 +102,15 @@ export class AuthService {
 
   checkSignedIn(
     req: CustomRequest,
-  ): { message: string } | { username: string } {
+  ): { message: string } | { username: string; authenticated: boolean } {
     const token = req.cookies?.jwt;
     if (!token) return { message: 'Not signed in' };
-
     try {
-      const decoded = jwt.verify(token, 'secretKey') as JwtPayload;
-      return { username: decoded.username };
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'default_secret',
+      ) as JwtPayload;
+      return { username: decoded.username, authenticated: true };
     } catch {
       return { message: 'Invalid token' };
     }

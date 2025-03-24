@@ -1,14 +1,15 @@
 import { Component } from "@angular/core"
 import { FormGroup, FormControl, Validators, AbstractControl } from "@angular/forms"
 import { ReactiveFormsModule } from "@angular/forms"
-import { CommonModule, JsonPipe } from "@angular/common"
+import { CommonModule } from "@angular/common"
 import { MatchPassword } from "../validators/match-password"
 import { UniqueUsername } from "../validators/unique-username"
 import { SharedModule } from "../../shared/shared.module"
+import { AuthService } from "../auth.service"
 
 @Component({
   selector: "app-signup",
-  imports: [ReactiveFormsModule, JsonPipe, SharedModule, CommonModule],
+  imports: [ReactiveFormsModule, SharedModule, CommonModule],
   templateUrl: "./signup.component.html",
   styleUrl: "./signup.component.scss",
 })
@@ -18,7 +19,11 @@ export class SignupComponent {
   passwordControl!: FormControl
   passwordConfirmationControl!: FormControl
 
-  constructor(private matchPassword: MatchPassword, private uniqueUsername: UniqueUsername) {
+  constructor(
+    private matchPassword: MatchPassword,
+    private uniqueUsername: UniqueUsername,
+    private authService: AuthService
+  ) {
     this.authForm = new FormGroup(
       {
         username: new FormControl("", [
@@ -42,5 +47,21 @@ export class SignupComponent {
     this.usernameControl = this.authForm.get("username") as FormControl
     this.passwordControl = this.authForm.get("password") as FormControl
     this.passwordConfirmationControl = this.authForm.get("passwordConfirmation") as FormControl
+  }
+
+  onSubmit() {
+    if (this.authForm.invalid) return
+    this.authService.signup(this.authForm.value).subscribe({
+      next: (response) => {
+        console.log("回應：", response)
+      },
+      error: (err) => {
+        if (!err.status) {
+          this.authForm.setErrors({ noConnection: true })
+        } else {
+          this.authForm.setErrors({ unknownError: true })
+        }
+      },
+    })
   }
 }
