@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Req, Res } from '@nestjs/common';
+import { Controller, Post, Get, Body, Req, Res, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 
@@ -16,8 +16,8 @@ export class AuthController {
     return this.authService.signin(body, res);
   }
 
-  @Post('username')
-  checkUsername(@Body('username') username: string) {
+  @Get('username/:username')
+  checkUsername(@Param('username') username: string) {
     return this.authService.checkUsername(username);
   }
 

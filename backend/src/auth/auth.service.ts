@@ -58,19 +58,16 @@ export class AuthService {
     };
     res.json(responseData);
     return responseData;
-    // return {
-    //   username: newUser.username,
-    //   authenticated: true,
-    // };
   }
 
-  async signin(body: SigninBody, res: Response): Promise<{ message: string }> {
+  async signin(body: SigninBody, res: Response): Promise<Response> {
     let token: string;
     const user = await this.userModel.findOne({ username: body.username });
 
     if (!user || !(await bcrypt.compare(body.password, user.password))) {
-      return { message: 'Invalid credentials' };
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
+
     try {
       const generatedToken = jwt.sign(
         { username: user.username },
@@ -87,12 +84,13 @@ export class AuthService {
       console.error('JWT signing error:', error);
       throw new Error('Internal server error');
     }
+
     res.cookie('jwt', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
-    return { message: 'Signed in successfully' };
+    return res.status(200).json({ message: 'Signed in successfully' });
   }
 
   async checkUsername(username: string): Promise<{ available: boolean }> {
@@ -116,8 +114,11 @@ export class AuthService {
     }
   }
 
-  signout(res: Response): { message: string } {
-    res.clearCookie('jwt');
-    return { message: 'Signed out successfully' };
+  signout(res: Response) {
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    });
+    return res.status(200).json({ message: 'Signed out successfully' });
   }
 }
