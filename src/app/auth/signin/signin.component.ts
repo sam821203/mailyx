@@ -4,6 +4,7 @@ import { AuthService } from "../auth.service"
 import { SharedModule } from "../../shared/shared.module"
 import { ReactiveFormsModule } from "@angular/forms"
 import { CommonModule } from "@angular/common"
+import { Router } from "@angular/router"
 
 @Component({
   selector: "app-signin",
@@ -30,10 +31,23 @@ export class SigninComponent {
     return this.authForm.get("password") as FormControl
   }
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
     if (this.authForm.invalid) return
-    this.authService.signin(this.authForm)
+    const credentials = {
+      username: this.authForm.value.username || "",
+      password: this.authForm.value.password || "",
+    }
+    this.authService.signin(credentials)?.subscribe({
+      next: () => {
+        this.router.navigateByUrl("/inbox")
+      },
+      error: ({ error }) => {
+        if (error.username || error.password) {
+          this.authForm.setErrors({ credentials: true })
+        }
+      },
+    })
   }
 }

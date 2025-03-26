@@ -6,6 +6,7 @@ import { MatchPassword } from "../validators/match-password"
 import { UniqueUsername } from "../validators/unique-username"
 import { SharedModule } from "../../shared/shared.module"
 import { AuthService } from "../auth.service"
+import { Router } from "@angular/router"
 
 @Component({
   selector: "app-signup",
@@ -22,7 +23,8 @@ export class SignupComponent {
   constructor(
     private matchPassword: MatchPassword,
     private uniqueUsername: UniqueUsername,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     this.authForm = new FormGroup(
       {
@@ -52,8 +54,8 @@ export class SignupComponent {
   onSubmit() {
     if (this.authForm.invalid) return
     this.authService.signup(this.authForm.value).subscribe({
-      next: (response) => {
-        console.log("回應：", response)
+      next: () => {
+        this.router.navigateByUrl("/inbox")
       },
       error: (err) => {
         if (!err.status) {

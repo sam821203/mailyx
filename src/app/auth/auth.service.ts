@@ -1,8 +1,7 @@
 import { Injectable } from "@angular/core"
 import { HttpClient } from "@angular/common/http"
-import { BehaviorSubject } from "rxjs"
+import { BehaviorSubject, Observable } from "rxjs"
 import { tap } from "rxjs/operators"
-import { FormGroup } from "@angular/forms"
 
 interface UsernameAvailableResponse {
   available: boolean
@@ -14,7 +13,12 @@ interface SignupCredentials {
   passwordConfirmation: string
 }
 
-interface SignupResponse {
+interface SigninCredentials {
+  username: string
+  password: string
+}
+
+interface SigninResponse {
   username: string
   message: string
 }
@@ -29,55 +33,54 @@ interface SignedInResponse {
 })
 export class AuthService {
   rootUrl = "http://localhost:3000"
-  signedIn$ = new BehaviorSubject(false)
+  signedin$ = new BehaviorSubject(false)
 
   constructor(private http: HttpClient) {}
 
   usernameAvailable(username: string) {
-    return this.http.post<UsernameAvailableResponse>(`${this.rootUrl}/auth/username`, {
-      username,
-    })
+    return this.http.get<UsernameAvailableResponse>(`${this.rootUrl}/auth/username/${username}`)
   }
 
   signup(credentials: SignupCredentials) {
     return this.http
-      .post<SignupResponse>(`${this.rootUrl}/auth/signup`, credentials, {
+      .post<SigninResponse>(`${this.rootUrl}/auth/signup`, credentials, {
         observe: "response",
       })
       .pipe(
         tap((response) => {
-          this.signedIn$.next(true)
+          if (response.ok) {
+            this.signedin$.next(true)
+          }
         })
       )
   }
 
   checkAuth() {
-    return this.http.get<SignedInResponse>(`${this.rootUrl}/auth/signedIn`).pipe(
+    return this.http.get<SignedInResponse>(`${this.rootUrl}/auth/signedin`).pipe(
       tap(({ authenticated }) => {
-        this.signedIn$.next(authenticated)
+        this.signedin$.next(authenticated)
       })
     )
   }
 
-  signin(authForm: FormGroup) {
-    if (authForm.invalid) return
-
-    this.http
-      .post<{ username: string; message: string }>(`${this.rootUrl}/auth/signin`, authForm.value, {
+  signin(credentials: SigninCredentials) {
+    return this.http
+      .post<SigninResponse>(`${this.rootUrl}/auth/signin`, credentials, {
         observe: "response",
+        withCredentials: true,
       })
       .pipe(
         tap(() => {
-          this.signedIn$.next(true)
+          this.signedin$.next(true)
         })
       )
-      .subscribe({
-        next: () => {
-          console.log("Signed in successfully")
-        },
-        error: () => {
-          authForm.setErrors({ invalidCredentials: true })
-        },
+  }
+
+  signout() {
+    return this.http.post(`${this.rootUrl}/auth/signout`, {}, { withCredentials: true }).pipe(
+      tap(() => {
+        this.signedin$.next(false)
       })
+    )
   }
 }

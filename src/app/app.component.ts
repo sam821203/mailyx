@@ -15,10 +15,10 @@ import { HTTP_INTERCEPTORS } from "@angular/common/http"
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthService, multi: true }],
 })
 export class AppComponent {
-  signedIn$: BehaviorSubject<boolean>
+  signedin$: BehaviorSubject<boolean>
 
   constructor(private authService: AuthService) {
-    this.signedIn$ = this.authService.signedIn$
+    this.signedin$ = this.authService.signedin$
   }
 
   ngOnInit() {
