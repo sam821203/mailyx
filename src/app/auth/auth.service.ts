@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core"
 import { HttpClient } from "@angular/common/http"
-import { BehaviorSubject, Observable } from "rxjs"
+import { BehaviorSubject } from "rxjs"
 import { tap } from "rxjs/operators"
 
 interface UsernameAvailableResponse {
@@ -24,7 +24,7 @@ interface SigninResponse {
 }
 
 interface SignedInResponse {
-  authenticated: boolean
+  authenticated: boolean | null
   username: string
 }
 
@@ -33,7 +33,7 @@ interface SignedInResponse {
 })
 export class AuthService {
   rootUrl = "http://localhost:3000"
-  signedin$ = new BehaviorSubject(false)
+  signedin$ = new BehaviorSubject<boolean | null>(null)
 
   constructor(private http: HttpClient) {}
 
@@ -58,7 +58,7 @@ export class AuthService {
   checkAuth() {
     return this.http.get<SignedInResponse>(`${this.rootUrl}/auth/signedin`).pipe(
       tap(({ authenticated }) => {
-        this.signedin$.next(authenticated)
+        this.signedin$.next(authenticated ?? false)
       })
     )
   }

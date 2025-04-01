@@ -15,7 +15,7 @@ import { HTTP_INTERCEPTORS } from "@angular/common/http"
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthService, multi: true }],
 })
 export class AppComponent {
-  signedin$: BehaviorSubject<boolean>
+  signedin$: BehaviorSubject<boolean | null>
 
   constructor(private authService: AuthService) {
     this.signedin$ = this.authService.signedin$
