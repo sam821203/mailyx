@@ -24,21 +24,20 @@ export class EmailsService {
   // 發送郵件並存入資料庫
   async sendEmail(createEmailDto: CreateEmailDto): Promise<Email> {
     const { subject, text, to, from } = createEmailDto;
-
     // 使用 Nodemailer 發送郵件
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER, // 你的 Gmail 帳號
-        pass: process.env.EMAIL_PASS, // 你的 Gmail 密碼或應用程式密碼
+        user: 'raystyle32613@gmail.com',
+        pass: 'ekdb ugpg elvt hqdb',
       },
     });
 
     await transporter.sendMail({
-      from,
-      to,
-      subject,
-      text,
+      from, // 使用前端傳來的發送者
+      to, // 收件者
+      subject, // 主題
+      text, // 內容
     });
 
     // 存入 MongoDB
