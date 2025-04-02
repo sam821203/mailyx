@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './auth/schemas/user.schema';
 import { EmailsModule } from './emails/emails.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -14,6 +15,10 @@ import { EmailsModule } from './emails/emails.module';
     ),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     EmailsModule,
+    ConfigModule.forRoot({
+      isGlobal: true, // 設為全局，這樣可以在所有地方使用 ConfigService
+      envFilePath: '.env', // 指定讀取 .env 文件
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -33,10 +33,16 @@ export class AuthService {
     body: SignupBody,
     res: Response,
   ): Promise<{ username: string; authenticated: boolean }> {
-    const hashedPassword = await bcrypt.hash(body.password, 10);
+    const { username, password } = body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 自動產生 Email
+    const email = `${username}@sandboxa26776d6a94041b4b6026cbab4b8661c.mailgun.org`;
+
     const newUser = new this.userModel({
-      username: body.username,
+      username: username,
       password: hashedPassword,
+      email,
     });
     await newUser.save();
 

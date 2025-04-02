@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http"
 import { Injectable } from "@angular/core"
 
-interface EmailSummary {
+export interface EmailSummary {
   id: string
   subject: string
   from: string
