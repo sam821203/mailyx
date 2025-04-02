@@ -1,6 +1,8 @@
 <div class="ui container">
   <div class="ui secondary printing menu">
-    <a routerLink="/" class="item">Angular email</a>
+    <a routerLink="/" class="item">
+      <h2>Mailyx</h2>
+    </a>
     <div class="right menu">
       <ng-container *ngIf="signedin$ | async">
         <a class="ui item" routerLink="/inbox" routerLinkActive="active">Inbox</a>

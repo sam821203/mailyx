@@ -16,4 +16,8 @@ export class CreateEmailDto {
   @IsString()
   @IsNotEmpty()
   from!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  html!: string;
 }

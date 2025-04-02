@@ -16,6 +16,9 @@ export class Email {
 
   @Prop({ required: true })
   from!: string;
+
+  @Prop({ required: true })
+  html!: string;
 }
 
 export const EmailSchema = SchemaFactory.createForClass(Email);

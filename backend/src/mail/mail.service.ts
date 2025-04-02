@@ -29,7 +29,13 @@ export class MailService {
   }
 
   // 發送郵件的核心方法
-  async sendMail(from: string, to: string, subject: string, text: string) {
+  async sendMail(
+    from: string,
+    to: string,
+    subject: string,
+    text: string,
+    html: string,
+  ) {
     const domain = this.configService.get<string>('MAILGUN_DOMAIN') || '';
     if (!domain) {
       throw new Error('MAILGUN_DOMAIN is not defined');
@@ -40,6 +46,7 @@ export class MailService {
         to,
         subject,
         text,
+        html,
       });
 
       console.log('Email sent:', data);

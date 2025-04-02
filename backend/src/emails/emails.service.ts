@@ -26,8 +26,10 @@ export class EmailsService {
   async sendEmail(createEmailDto: CreateEmailDto): Promise<Email> {
     const { subject, text, to, from } = createEmailDto;
 
+    const html = `<p>${text.replace(/\n/g, '<br>')}</p>`;
+
     // 使用 mailService 來發送郵件
-    await this.mailService.sendMail(from, to, subject, text);
+    await this.mailService.sendMail(from, to, subject, text, html);
 
     // 存儲郵件訊息到 MongoDB
     const createdEmail = new this.emailModel(createEmailDto);

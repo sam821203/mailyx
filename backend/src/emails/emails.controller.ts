@@ -26,6 +26,7 @@ export class EmailsController {
       text: string;
       to: string;
       from: string;
+      html: string;
     },
   ) {
     return await this.emailsService.sendEmail(emailData);
