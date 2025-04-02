@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core"
 import { HttpClient } from "@angular/common/http"
-import { BehaviorSubject } from "rxjs"
+import { BehaviorSubject, catchError, of } from "rxjs"
 import { tap } from "rxjs/operators"
 
 interface UsernameAvailableResponse {
@@ -59,6 +59,10 @@ export class AuthService {
     return this.http.get<SignedInResponse>(`${this.rootUrl}/auth/signedin`).pipe(
       tap(({ authenticated }) => {
         this.signedin$.next(authenticated ?? false)
+      }),
+      catchError(() => {
+        this.signedin$.next(false)
+        return of({ authenticated: false, username: "" }) // 回傳預設值
       })
     )
   }

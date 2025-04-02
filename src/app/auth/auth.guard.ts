@@ -1,7 +1,7 @@
 import { CanMatchFn, Router } from "@angular/router"
 import { inject } from "@angular/core"
 import { AuthService } from "./auth.service"
-import { map, take, tap } from "rxjs/operators"
+import { filter, map, take } from "rxjs/operators"
 
 // 函式型守衛
 export const authGuard: CanMatchFn = (route, segments) => {
@@ -9,13 +9,15 @@ export const authGuard: CanMatchFn = (route, segments) => {
   const router = inject(Router)
 
   return authService.signedin$.pipe(
+    // 等待 signedIn 不再是 null
+    filter((signedIn) => signedIn !== null),
     take(1),
-    tap((signedIn) => {
+    map((signedIn) => {
       if (!signedIn) {
-        // 未登入則導向登入頁
         router.navigate(["/auth/signin"])
+        return false
       }
-    }),
-    map((signedIn) => !!signedIn)
+      return true
+    })
   )
 }

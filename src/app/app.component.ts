@@ -1,4 +1,4 @@
-import { Component } from "@angular/core"
+import { Component, OnInit } from "@angular/core"
 import { RouterOutlet } from "@angular/router"
 import { AuthModule } from "./auth/auth.module"
 import { AuthService } from "./auth/auth.service"
@@ -14,7 +14,7 @@ import { HTTP_INTERCEPTORS } from "@angular/common/http"
   styleUrl: "./app.component.scss",
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthService, multi: true }],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   signedin$: BehaviorSubject<boolean | null>
 
   constructor(private authService: AuthService) {
