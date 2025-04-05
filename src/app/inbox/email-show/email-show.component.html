@@ -1,4 +1,4 @@
-<div class="header" *ngIf="email">
+<div class="header">
   <div>
     <h3>{{ email.subject }}</h3>
     <div>
@@ -9,3 +9,5 @@
     </div>
   </div>
 </div>
+<div class="ui divider"></div>
+<div [innerHTML]="email.html"></div>

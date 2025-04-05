@@ -1,7 +1,5 @@
 import { Component, OnInit } from "@angular/core"
 import { ActivatedRoute } from "@angular/router"
-import { EmailService } from "../email.service"
-import { switchMap } from "rxjs/operators"
 import { Email } from "../email.model"
 import { CommonModule } from "@angular/common"
 
@@ -14,11 +12,13 @@ import { CommonModule } from "@angular/common"
 export class EmailShowComponent implements OnInit {
   email!: Email
 
-  constructor(private route: ActivatedRoute, private emailService: EmailService) {}
-
-  ngOnInit() {
-    this.route.params.pipe(switchMap(({ id }) => this.emailService.getEmail(id))).subscribe((email) => {
+  constructor(private route: ActivatedRoute) {
+    // 初始化
+    this.email = this.route.snapshot.data["email"]
+    this.route.data.subscribe(({ email }) => {
       this.email = email
     })
   }
+
+  ngOnInit() {}
 }
