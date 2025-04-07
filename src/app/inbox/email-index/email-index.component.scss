@@ -5,7 +5,6 @@
     padding: 10px 0;
     display: flex;
     align-items: center;
-    border-radius: 5px;
     transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
 
     &:hover {
@@ -29,4 +28,38 @@
       }
     }
   }
+}
+
+.ui.celled.list {
+  margin: 0;
+  border-radius: 0;
+}
+
+.ui.celled.list .item {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s;
+}
+
+.ui.celled.list .item:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.ui.celled.list .item.active {
+  background-color: #e3f2fd;
+}
+
+.ui.celled.list .item .header {
+  font-weight: 600;
+  color: #202124;
+  margin-bottom: 4px;
+}
+
+.ellipsis {
+  color: #5f6368;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
 }
